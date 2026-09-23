@@ -4,3 +4,9 @@ _bmad/*
 .claude
 .cline
 .memlog.md
+node_modules
+dist
+.nx
+coverage
+*.log
+*.tsbuildinfo

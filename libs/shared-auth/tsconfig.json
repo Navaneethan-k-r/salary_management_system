@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "../../dist/out-tsc/libs/shared-auth",
+    "tsBuildInfoFile": "../../dist/out-tsc/libs/shared-auth/tsconfig.tsbuildinfo",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "typeRoots": ["../../node_modules/@types"],
+    "types": ["node"]
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../shared-types" }
+  ]
+}

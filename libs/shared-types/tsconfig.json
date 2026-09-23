@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "rootDir": "src",
+    "outDir": "../../dist/out-tsc/libs/shared-types",
+    "tsBuildInfoFile": "../../dist/out-tsc/libs/shared-types/tsconfig.tsbuildinfo",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "typeRoots": ["../../node_modules/@types"],
+    "types": []
+  },
+  "include": ["src/**/*"]
+}

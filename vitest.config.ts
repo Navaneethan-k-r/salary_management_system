@@ -1,0 +1,17 @@
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    projects: [
+      'apps/frontend-web/vite.config.ts',
+      {
+        test: {
+          name: 'shared-auth',
+          root: './libs/shared-auth',
+          environment: 'node',
+          globals: true,
+        },
+      },
+    ],
+  },
+});
