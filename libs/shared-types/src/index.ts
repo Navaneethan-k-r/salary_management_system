@@ -62,3 +62,15 @@ export interface AuthResponseDto {
     role: UserRole;
   };
 }
+
+export interface CreateOrganizationProfileDto {
+  name: string;
+  code: string;
+  contactEmail: string;
+}
+
+export interface UpdateOrganizationProfileDto {
+  name?: string;
+  code?: string;
+  contactEmail?: string;
+}

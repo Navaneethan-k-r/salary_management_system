@@ -12,6 +12,14 @@ export default defineConfig({
           globals: true,
         },
       },
+      {
+        test: {
+          name: 'service-employee',
+          root: './apps/service-employee',
+          environment: 'node',
+          globals: true,
+        },
+      },
     ],
   },
 });

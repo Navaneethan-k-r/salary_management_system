@@ -19,6 +19,7 @@
     "migration:run:employee": "nx run service-employee:migration:run"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.2.6",
     "@nx/js": "^20.4.0",
     "@nx/nest": "^23.2.1",
     "@nx/react": "^20.4.0",

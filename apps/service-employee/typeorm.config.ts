@@ -15,7 +15,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD || 'rootpassword',
   database: process.env.DB_DATABASE || 'salary_management',
   synchronize: false,
-  logging: process.env.NODE_ENV !== 'production',
+  logging: ['error', 'warn'],
   entities: [HrAdmin],
   migrations: [path.join(__dirname, 'migrations/*{.ts,.js}')],
   subscribers: [],

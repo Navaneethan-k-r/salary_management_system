@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { DataSource } from 'typeorm';
 import { HrAdmin } from './hr-admin.entity';
+import { Organization } from './organization.entity';
 
 // Load environment variables from apps/service-employee/.env or root
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
@@ -15,8 +16,8 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD || 'rootpassword',
   database: process.env.DB_DATABASE || 'salary_management',
   synchronize: false,
-  logging: process.env.NODE_ENV !== 'production',
-  entities: [HrAdmin],
+  logging: ['error', 'warn'],
+  entities: [HrAdmin, Organization],
   migrations: [path.join(__dirname, '../../migrations/*{.ts,.js}')],
   subscribers: [],
 });

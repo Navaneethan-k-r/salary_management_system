@@ -20,6 +20,8 @@
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictPropertyInitialization": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "@salary-mgmt/shared-types": [
         "libs/shared-types/src/index.ts"

@@ -18,6 +18,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import BusinessIcon from '@mui/icons-material/Business';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAppDispatch } from '../store';
 import { logout } from '../store/slices/authSlice';
@@ -38,6 +39,7 @@ export const AdminLayout: React.FC = () => {
 
   const navItems = [
     { text: 'Dashboard', path: '/admin/dashboard', icon: <DashboardIcon /> },
+    { text: 'Organization', path: '/admin/organization', icon: <BusinessIcon /> },
     { text: 'Employees', path: '/admin/employees', icon: <PeopleIcon /> },
     { text: 'Salary Config', path: '/admin/salary-config', icon: <SettingsIcon /> },
     { text: 'Payslips', path: '/admin/payslips', icon: <ReceiptIcon /> },

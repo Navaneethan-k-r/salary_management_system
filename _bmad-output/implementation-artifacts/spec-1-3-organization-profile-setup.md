@@ -2,7 +2,8 @@
 title: 'Story 1.3: Organization Profile Setup'
 type: 'feature'
 created: '2026-09-23'
-status: 'ready-for-dev'
+status: 'review'
+baseline_commit: '51fa9dc586a49c173cbaf09c38a3a5837cf488a8'
 route: 'dispatch'
 review_loop_iteration: 0
 context:
@@ -66,15 +67,15 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `libs/shared-types/src/index.ts` -- Add `CreateOrganizationProfileDto` and `UpdateOrganizationProfileDto` interfaces -- Establishes typed contract between frontend and backend.
-- [ ] `apps/service-employee/src/database/schema.sql` -- Create MySQL table definition for `organizations` with constraints and indexes -- Implements AD-1 database persistence.
-- [ ] `apps/service-employee/src/organization/organization.service.ts` & `apps/service-employee/src/organization/organization.controller.ts` -- Implement NestJS controller and service for `GET /api/organization` and `PUT /api/organization` -- Provides REST endpoints per CAP-1.
-- [ ] `apps/service-employee/src/organization/organization.service.spec.ts` -- Unit tests verifying organization profile creation, update, and database retrieval -- Validates backend business logic and validation rules.
-- [ ] `apps/frontend-web/src/services/organizationService.ts` -- Implement client organization service with mock and HTTP adapters -- Connects UI to backend API.
-- [ ] `apps/frontend-web/src/store/slices/organizationSlice.ts` & `apps/frontend-web/src/store/index.ts` -- Implement Redux Toolkit slice and attach to store -- Manages organization profile state.
-- [ ] `apps/frontend-web/src/pages/OrganizationProfilePage.tsx` -- Build organization setup page with MUI form controls, INR badge, Skeleton loader, and Snackbar notification -- Delivers HR organization profile UI.
-- [ ] `apps/frontend-web/src/layouts/AdminLayout.tsx` & `apps/frontend-web/src/app/App.tsx` -- Add Organization navigation link and configure `/admin/organization` route -- Integrates view into admin navigation shell.
-- [ ] `apps/frontend-web/src/pages/OrganizationProfilePage.spec.tsx` -- Implement unit tests for organization setup form, validation, loading skeletons, and save feedback -- Verifies all I/O scenarios.
+- [x] `libs/shared-types/src/index.ts` -- Add `CreateOrganizationProfileDto` and `UpdateOrganizationProfileDto` interfaces -- Establishes typed contract between frontend and backend.
+- [x] `apps/service-employee/migrations/1700000000001-CreateOrganizationsTable.ts` -- Create TypeORM migration for `organizations` table with constraints and indexes -- Implements AD-1 database persistence.
+- [x] `apps/service-employee/src/organization/organization.service.ts` & `apps/service-employee/src/organization/organization.controller.ts` -- Implement NestJS controller and service for `GET /api/organization` and `PUT /api/organization` -- Provides REST endpoints per CAP-1.
+- [x] `apps/service-employee/src/organization/organization.service.spec.ts` -- Unit tests verifying organization profile creation, update, and database retrieval -- Validates backend business logic and validation rules.
+- [x] `apps/frontend-web/src/services/organizationService.ts` -- Implement client organization service with mock and HTTP adapters -- Connects UI to backend API.
+- [x] `apps/frontend-web/src/store/slices/organizationSlice.ts` & `apps/frontend-web/src/store/index.ts` -- Implement Redux Toolkit slice and attach to store -- Manages organization profile state.
+- [x] `apps/frontend-web/src/pages/OrganizationProfilePage.tsx` -- Build organization setup page with MUI form controls, INR badge, Skeleton loader, and Snackbar notification -- Delivers HR organization profile UI.
+- [x] `apps/frontend-web/src/layouts/AdminLayout.tsx` & `apps/frontend-web/src/app/App.tsx` -- Add Organization navigation link and configure `/admin/organization` route -- Integrates view into admin navigation shell.
+- [x] `apps/frontend-web/src/pages/OrganizationProfilePage.spec.tsx` -- Implement unit tests for organization setup form, validation, loading skeletons, and save feedback -- Verifies all I/O scenarios.
 
 **Acceptance Criteria:**
 - Given a logged-in HR Administrator navigating to `/admin/organization`, when the page loads, then existing organization profile data is fetched and populated, or an empty form with locked INR currency is displayed if unconfigured.
