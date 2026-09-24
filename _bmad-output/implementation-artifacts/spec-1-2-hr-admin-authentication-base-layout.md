@@ -2,7 +2,8 @@
 title: 'Story 1.2: HR Admin Authentication & Base Layout'
 type: 'feature'
 created: '2026-09-23'
-status: 'ready-for-dev'
+status: 'in-review'
+baseline_commit: '3b783f84d9a6c46598ab9a6cf2c8005393f1ab56'
 route: 'dispatch'
 review_loop_iteration: 0
 context:
@@ -67,18 +68,18 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `libs/shared-types/src/index.ts` -- Add `LoginCredentialsDto` and `AuthResponseDto` interfaces -- Formalizes auth contract across frontend and backend.
-- [ ] `libs/shared-auth/src/index.ts` & `libs/shared-auth/src/session-store.ts` -- Implement `generateOpaqueToken()` and `RedisSessionStore` with in-memory fallback -- Fulfills AD-3 stateful Redis session token management.
-- [ ] `libs/shared-auth/src/session-store.spec.ts` -- Add unit test suite for token generation (<12 chars) and session store lifecycle -- Verifies auth library invariants.
-- [ ] `apps/frontend-web/package.json` -- Add dependencies (`react-router-dom`, `@reduxjs/toolkit`, `react-redux`, `@mui/icons-material`) -- Supplies routing and state management libraries.
-- [ ] `apps/frontend-web/src/store/index.ts` & `apps/frontend-web/src/store/slices/authSlice.ts` -- Implement Redux Toolkit store and auth slice -- Provides centralized auth state and session persistence.
-- [ ] `apps/frontend-web/src/services/authService.ts` -- Implement authentication service with mock and REST client adapters -- Enables authentication communication.
-- [ ] `apps/frontend-web/src/components/ProtectedRoute.tsx` -- Implement route guard component -- Enforces access control on `/admin/*` routes.
-- [ ] `apps/frontend-web/src/layouts/AdminLayout.tsx` -- Implement administrative layout with fixed 260px sidebar and elevation-0 App Bar per DESIGN.md -- Delivers core HR shell.
-- [ ] `apps/frontend-web/src/pages/LoginPage.tsx` -- Implement HR Admin login page with Material UI outlined inputs, validation, and error states -- Provides authentication entry point.
-- [ ] `apps/frontend-web/src/pages/AdminDashboardPlaceholder.tsx` -- Implement dashboard overview placeholder page -- Verifies route resolution within AdminLayout.
-- [ ] `apps/frontend-web/src/app/App.tsx` -- Configure routing with `BrowserRouter`, Redux provider, and route redirects -- Connects all views and guards.
-- [ ] `apps/frontend-web/src/pages/LoginPage.spec.tsx` & `apps/frontend-web/src/layouts/AdminLayout.spec.tsx` -- Implement unit tests for login flow, protected routing, and admin layout -- Validates all I/O scenarios and design requirements.
+- [x] `libs/shared-types/src/index.ts` -- Add `LoginCredentialsDto` and `AuthResponseDto` interfaces -- Formalizes auth contract across frontend and backend.
+- [x] `libs/shared-auth/src/index.ts` & `libs/shared-auth/src/session-store.ts` -- Implement `generateOpaqueToken()` and `RedisSessionStore` with in-memory fallback -- Fulfills AD-3 stateful Redis session token management.
+- [x] `libs/shared-auth/src/session-store.spec.ts` -- Add unit test suite for token generation (<12 chars) and session store lifecycle -- Verifies auth library invariants.
+- [x] `apps/frontend-web/package.json` -- Add dependencies (`react-router-dom`, `@reduxjs/toolkit`, `react-redux`, `@mui/icons-material`) -- Supplies routing and state management libraries.
+- [x] `apps/frontend-web/src/store/index.ts` & `apps/frontend-web/src/store/slices/authSlice.ts` -- Implement Redux Toolkit store and auth slice -- Provides centralized auth state and session persistence.
+- [x] `apps/frontend-web/src/services/authService.ts` -- Implement authentication service with mock and REST client adapters -- Enables authentication communication.
+- [x] `apps/frontend-web/src/components/ProtectedRoute.tsx` -- Implement route guard component -- Enforces access control on `/admin/*` routes.
+- [x] `apps/frontend-web/src/layouts/AdminLayout.tsx` -- Implement administrative layout with fixed 260px sidebar and elevation-0 App Bar per DESIGN.md -- Delivers core HR shell.
+- [x] `apps/frontend-web/src/pages/LoginPage.tsx` -- Implement HR Admin login page with Material UI outlined inputs, validation, and error states -- Provides authentication entry point.
+- [x] `apps/frontend-web/src/pages/AdminDashboardPlaceholder.tsx` -- Implement dashboard overview placeholder page -- Verifies route resolution within AdminLayout.
+- [x] `apps/frontend-web/src/app/App.tsx` -- Configure routing with `BrowserRouter`, Redux provider, and route redirects -- Connects all views and guards.
+- [x] `apps/frontend-web/src/pages/LoginPage.spec.tsx` & `apps/frontend-web/src/layouts/AdminLayout.spec.tsx` -- Implement unit tests for login flow, protected routing, and admin layout -- Validates all I/O scenarios and design requirements.
 
 **Acceptance Criteria:**
 - Given an HR administrator with valid credentials (`admin@salarymgmt.com` / `admin123`), when submitting the login form on `/login`, then an opaque token (<12 chars) is issued, session is stored in Redis, and user is redirected to `/admin/dashboard`.

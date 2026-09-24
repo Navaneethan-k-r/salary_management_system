@@ -143,6 +143,19 @@ So that I have a quick summary of the organization's current state upon logging 
 **Then** I see the total count of employees
 **And** I see a summary of the most recent payroll runs.
 
+### Story 1.5: Backend Authentication API
+
+As a System (Frontend),
+I want a NestJS REST API backend that handles authentication and session management,
+So that HR Administrators can log in with their real credentials and the frontend can establish a secure session.
+
+**Acceptance Criteria:**
+
+**Given** the frontend sends a POST request to `/api/auth/login` with valid HR admin credentials
+**When** the backend receives the request
+**Then** it verifies the credentials against the MySQL database (or a seeded default admin)
+**And** generates an opaque token using the `shared-auth` library, storing the session in Redis, and returns the token.
+
 ## Epic 2: Employee Lifecycle & Portal Onboarding
 
 Enable HR to securely manage the employee directory, and allow employees to activate their accounts and access their self-service portal.

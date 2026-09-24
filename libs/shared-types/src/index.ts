@@ -46,3 +46,19 @@ export interface ApiResponse<T> {
   data: T;
   message?: string;
 }
+
+export interface LoginCredentialsDto {
+  email: string;
+  password?: string;
+  token?: string; // For magic links
+}
+
+export interface AuthResponseDto {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    fullName: string;
+    role: UserRole;
+  };
+}

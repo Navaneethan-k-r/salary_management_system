@@ -1,0 +1,24 @@
+{
+  "name": "service-employee",
+  "projectType": "application",
+  "sourceRoot": "apps/service-employee/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/service-employee",
+        "main": "apps/service-employee/src/main.ts",
+        "tsConfig": "apps/service-employee/tsconfig.app.json"
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "service-employee:build"
+      }
+    }
+  }
+}
