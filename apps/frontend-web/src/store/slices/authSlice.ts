@@ -72,19 +72,26 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         
-        // Mock session payload for Redux from AuthResponseDto
-        const mockSession: UserSession = {
+        // Extract session details from AuthResponseDto
+        const user = action.payload.user || {
+          id: 'admin-id',
+          role: 'hr_admin',
+          email: action.meta.arg.email,
+          fullName: 'HR Admin',
+        };
+
+        const session: UserSession = {
           token: action.payload.token,
-          userId: action.payload.user.id,
-          role: action.payload.user.role,
-          email: action.payload.user.email,
+          userId: user.id,
+          role: user.role,
+          email: user.email,
           organizationId: 'org-1',
           createdAt: new Date().toISOString(),
           expiresAt: new Date(Date.now() + 86400000).toISOString(),
         };
         
-        state.session = mockSession;
-        sessionStorage.setItem('auth_session', JSON.stringify(mockSession));
+        state.session = session;
+        sessionStorage.setItem('auth_session', JSON.stringify(session));
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;

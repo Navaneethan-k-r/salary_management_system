@@ -3,14 +3,13 @@ import { LoginCredentialsDto, AuthResponseDto } from '@salary-mgmt/shared-types'
 export type LoginRequest = LoginCredentialsDto;
 
 class AuthService {
-  private baseUrl = '/api/auth';
-  private useMock = false; // Connect to real NestJS backend
+  // Use VITE_API_BASE_URL if configured, otherwise default to relative path '/api/auth' (handled by reverse proxy/Vite proxy)
+  private get baseUrl(): string {
+    const configuredBase = import.meta.env.VITE_API_BASE_URL;
+    return configuredBase ? `${configuredBase.replace(/\/$/, '')}/api/auth` : '/api/auth';
+  }
 
   async login(credentials: LoginRequest): Promise<AuthResponseDto> {
-    if (this.useMock) {
-      return this.mockLogin(credentials);
-    }
-
     const response = await fetch(`${this.baseUrl}/login`, {
       method: 'POST',
       headers: {
@@ -20,8 +19,18 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Login failed');
+      let errorMessage = 'Login failed';
+      try {
+        const errorData = await response.json();
+        if (Array.isArray(errorData.message)) {
+          errorMessage = errorData.message.join(', ');
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch {
+        errorMessage = `Request failed with status ${response.status}`;
+      }
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();
@@ -29,49 +38,31 @@ class AuthService {
   }
 
   async logout(): Promise<void> {
-    if (this.useMock) {
-      return new Promise(resolve => setTimeout(resolve, 300));
-    }
-
     const sessionData = sessionStorage.getItem('auth_session');
     let token = '';
     if (sessionData) {
       try {
         const parsed = JSON.parse(sessionData);
-        token = parsed.token;
-      } catch (e) {}
-    }
-
-    const response = await fetch(`${this.baseUrl}/logout`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
+        token = parsed.token || '';
+      } catch {
+        // Ignore session parse error on logout
       }
-    });
-
-    if (!response.ok) {
-      console.error('Logout failed on server');
     }
-  }
 
-  private mockLogin(credentials: LoginRequest): Promise<AuthResponseDto> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (credentials.email === 'admin@salarymgmt.com' && credentials.password === 'admin123') {
-          resolve({
-            token: 'mock123token',
-            user: {
-              id: 'admin-1',
-              email: 'admin@salarymgmt.com',
-              fullName: 'Admin User',
-              role: 'hr_admin'
-            }
-          });
-        } else {
-          reject(new Error('Invalid email or password'));
-        }
-      }, 500);
-    });
+    try {
+      const response = await fetch(`${this.baseUrl}/logout`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn('Logout endpoint responded with status:', response.status);
+      }
+    } catch (err) {
+      console.warn('Failed to reach logout endpoint:', err);
+    }
   }
 }
 

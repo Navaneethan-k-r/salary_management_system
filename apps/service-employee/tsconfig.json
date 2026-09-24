@@ -12,11 +12,10 @@
     "outDir": "../../dist/out-tsc",
     "baseUrl": "./",
     "incremental": true,
-    "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallbackBumps": true
+    "moduleResolution": "node"
   },
   "files": [],
   "include": [],

@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { DataSource } from 'typeorm';
-import { HrAdmin } from './src/database/hr-admin.entity';
+import { HrAdmin } from './hr-admin.entity';
 
-// Ensure .env is loaded
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+// Load environment variables from apps/service-employee/.env or root
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -17,6 +17,6 @@ export const AppDataSource = new DataSource({
   synchronize: false,
   logging: process.env.NODE_ENV !== 'production',
   entities: [HrAdmin],
-  migrations: [path.join(__dirname, 'migrations/*{.ts,.js}')],
+  migrations: [path.join(__dirname, '../../migrations/*{.ts,.js}')],
   subscribers: [],
 });

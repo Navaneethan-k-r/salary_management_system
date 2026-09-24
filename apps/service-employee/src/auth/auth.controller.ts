@@ -1,5 +1,6 @@
-import { Controller, Post, Body, UnauthorizedException, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -7,17 +8,11 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() body: any) {
-    if (!body || !body.email || !body.password) {
-      throw new BadRequestException('Email and password are required');
-    }
-    
-    const token = await this.authService.validateUser(body.email, body.password);
-    
-    if (!token) {
+  async login(@Body() loginDto: LoginDto) {
+    const result = await this.authService.validateUser(loginDto.email, loginDto.password);
+    if (!result) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    
-    return { token };
+    return result;
   }
 }

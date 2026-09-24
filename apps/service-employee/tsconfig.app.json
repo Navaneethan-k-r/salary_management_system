@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "outDir": "../../dist/apps/service-employee",
     "module": "commonjs",
     "types": ["node"]
   },
@@ -11,6 +11,7 @@
     "src/**/*.test.ts"
   ],
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "migrations/**/*.ts"
   ]
 }

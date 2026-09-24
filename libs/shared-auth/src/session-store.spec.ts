@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { generateOpaqueToken, REDIS_SESSION_KEY_PREFIX } from './index.js';
-import { RedisSessionStore } from './session-store.js';
+import { generateOpaqueToken, REDIS_SESSION_KEY_PREFIX, RedisSessionStore } from './index';
 import { UserSession } from '@salary-mgmt/shared-types';
 
 describe('Auth Library', () => {
@@ -30,7 +29,7 @@ describe('Auth Library', () => {
         email: 'test@example.com',
         organizationId: 'org-123',
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 86400000).toISOString()
+        expiresAt: new Date(Date.now() + 86400000).toISOString(),
       };
     });
 

@@ -4,20 +4,23 @@
   "sourceRoot": "apps/service-employee/src",
   "targets": {
     "build": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/service-employee"],
       "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/apps/service-employee",
-        "main": "apps/service-employee/src/main.ts",
-        "tsConfig": "apps/service-employee/tsconfig.app.json"
+        "command": "tsc -p apps/service-employee/tsconfig.app.json"
       }
     },
     "serve": {
-      "executor": "@nx/js:node",
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
       "options": {
-        "buildTarget": "service-employee:build"
+        "command": "node dist/apps/service-employee/src/main.js"
+      }
+    },
+    "migration:run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "typeorm migration:run -d dist/apps/service-employee/src/database/data-source.js"
       }
     }
   }
