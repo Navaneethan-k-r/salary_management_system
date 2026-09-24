@@ -34,7 +34,8 @@ export class EmployeeService {
     sortOrder: 'ASC' | 'DESC' = 'ASC',
   ): Promise<PaginatedResponseDto<EmployeeListDto>> {
     const queryBuilder = this.employeeRepository.createQueryBuilder('employee')
-      .where('employee.organizationId = :organizationId', { organizationId });
+      .where('employee.organizationId = :organizationId', { organizationId })
+      .andWhere('employee.isActive = :isActive', { isActive: true });
 
     if (search) {
       queryBuilder.andWhere(
@@ -89,7 +90,7 @@ export class EmployeeService {
     dto: UpdateEmployeeDto,
   ): Promise<EmployeeListDto> {
     const employee = await this.employeeRepository.findOne({
-      where: { id, organizationId },
+      where: { id, organizationId, isActive: true },
     });
     if (!employee) {
       throw new NotFoundException(`Employee with id "${id}" not found.`);
@@ -101,5 +102,22 @@ export class EmployeeService {
 
     const saved = await this.employeeRepository.save(employee);
     return this.toDto(saved);
+  }
+
+  async deleteEmployee(
+    id: string,
+    organizationId: string,
+  ): Promise<void> {
+    const employee = await this.employeeRepository.findOne({
+      where: { id, organizationId, isActive: true },
+    });
+    if (!employee) {
+      throw new NotFoundException(`Employee with id "${id}" not found.`);
+    }
+
+    // Soft delete: mark as inactive and record the deletion timestamp
+    employee.isActive = false;
+    employee.deletedAt = new Date();
+    await this.employeeRepository.save(employee);
   }
 }

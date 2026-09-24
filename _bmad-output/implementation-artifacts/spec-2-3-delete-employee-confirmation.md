@@ -2,9 +2,10 @@
 title: 'Story 2.3: Delete Employee Confirmation'
 type: 'feature'
 created: '2026-09-23'
-status: 'ready-for-dev'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: '69e9da9b8929bc35a9c0fcd8396d0955f2b88b8d'
 context:
   - '_bmad-output/implementation-artifacts/epic-2-context.md'
 ---
@@ -51,11 +52,12 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `apps/service-employee/src/employee/employee.service.ts` & `apps/service-employee/src/employee/employee.controller.ts` -- Implement `DELETE /api/employees/:id` endpoint -- Handles database deletion.
-- [ ] `apps/frontend-web/src/services/employeeService.ts` -- Add client service method for deletion -- Connects frontend action to backend API.
-- [ ] `apps/frontend-web/src/store/slices/employeeSlice.ts` -- Add thunk for delete -- Manages async state and updates the local list by removing the deleted employee.
-- [ ] `apps/frontend-web/src/components/DeleteEmployeeDialog.tsx` -- Build the confirmation dialog -- Provides the reassurance UI.
-- [ ] `apps/frontend-web/src/pages/EmployeeDirectoryPage.tsx` -- Wire up "Delete" button to the dialog -- Integrates the action into the directory view.
+- [x] `apps/service-employee/src/employee/employee.service.ts` & `apps/service-employee/src/employee/employee.controller.ts` -- Implement `DELETE /api/employees/:id` endpoint -- Handles database deletion.
+  - [x] `apps/service-employee/migrations/1790250636833-AddSoftDeleteToEmployees.ts` -- Migration adds `is_active` and `deleted_at` columns.
+- [x] `apps/frontend-web/src/services/employeeService.ts` -- Add client service method for deletion -- Connects frontend action to backend API.
+- [x] `apps/frontend-web/src/store/slices/employeeSlice.ts` -- Add thunk for delete -- Manages async state and updates the local list by removing the deleted employee.
+- [x] `apps/frontend-web/src/components/DeleteEmployeeDialog.tsx` -- Build the confirmation dialog -- Provides the reassurance UI.
+- [x] `apps/frontend-web/src/pages/EmployeeDirectoryPage.tsx` -- Wire up "Delete" button to the dialog -- Integrates the action into the directory view.
 
 **Acceptance Criteria:**
 - Given I am on the Employee Directory, when I click "Delete" on a specific employee row, then a reassurance confirmation dialog appears.
@@ -63,6 +65,8 @@ context:
 - Given the delete confirmation dialog is open, when I confirm the deletion, then the dialog closes, the employee is removed from the directory list, and a "Employee deleted successfully" toast appears.
 
 ## Implementation Notes
+
+- `DELETE /api/employees/:id`: Returns HTTP 200 OK with `{ message: 'Employee deleted successfully' }` instead of 204 No Content to provide explicit deletion feedback to API callers.
 
 ## Spec Change Log
 

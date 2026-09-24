@@ -20,6 +20,12 @@ export class EmployeeEntity {
   @Column({ type: 'enum', enum: ['active', 'inactive', 'pending_onboarding'], default: 'pending_onboarding' })
   status!: 'active' | 'inactive' | 'pending_onboarding';
 
+  @Column({ name: 'is_active', type: 'boolean', default: true })
+  isActive!: boolean;
+
+  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true, default: null })
+  deletedAt!: Date | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt!: Date;
 

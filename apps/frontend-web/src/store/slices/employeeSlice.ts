@@ -12,6 +12,8 @@ interface EmployeeState {
   error: string | null;
   mutating: boolean;
   mutationError: string | null;
+  deleting: boolean;
+  deletionError: string | null;
 }
 
 const initialState: EmployeeState = {
@@ -24,6 +26,8 @@ const initialState: EmployeeState = {
   error: null,
   mutating: false,
   mutationError: null,
+  deleting: false,
+  deletionError: null,
 };
 
 export const fetchEmployees = createAsyncThunk(
@@ -62,6 +66,22 @@ export const updateEmployee = createAsyncThunk(
   }
 );
 
+export const deleteEmployee = createAsyncThunk(
+  'employee/deleteEmployee',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      await employeeService.deleteEmployee(id);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.status === 404
+          ? 'Employee could not be found or was already deleted.'
+          : error.response?.data?.message || 'Failed to delete employee'
+      );
+    }
+  }
+);
+
 const employeeSlice = createSlice({
   name: 'employee',
   initialState,
@@ -74,6 +94,9 @@ const employeeSlice = createSlice({
     },
     clearMutationError: (state) => {
       state.mutationError = null;
+    },
+    clearDeletionError: (state) => {
+      state.deletionError = null;
     },
   },
   extraReducers: (builder) => {
@@ -124,9 +147,23 @@ const employeeSlice = createSlice({
       .addCase(updateEmployee.rejected, (state, action) => {
         state.mutating = false;
         state.mutationError = action.payload as string;
+      })
+      // Delete
+      .addCase(deleteEmployee.pending, (state) => {
+        state.deleting = true;
+        state.deletionError = null;
+      })
+      .addCase(deleteEmployee.fulfilled, (state, action: PayloadAction<string>) => {
+        state.deleting = false;
+        state.data = state.data.filter(e => e.id !== action.payload);
+        state.total = Math.max(0, state.total - 1);
+      })
+      .addCase(deleteEmployee.rejected, (state, action) => {
+        state.deleting = false;
+        state.deletionError = action.payload as string;
       });
   },
 });
 
-export const { setPage, setLimit, clearMutationError } = employeeSlice.actions;
+export const { setPage, setLimit, clearMutationError, clearDeletionError } = employeeSlice.actions;
 export default employeeSlice.reducer;

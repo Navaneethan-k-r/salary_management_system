@@ -118,3 +118,41 @@ describe('EmployeeService — updateEmployee', () => {
     ).rejects.toThrow(NotFoundException);
   });
 });
+
+describe('EmployeeService — deleteEmployee', () => {
+  let service: EmployeeService;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        EmployeeService,
+        { provide: getRepositoryToken(EmployeeEntity), useValue: mockRepo },
+      ],
+    }).compile();
+    service = module.get<EmployeeService>(EmployeeService);
+  });
+
+  it('soft-deletes the employee by setting isActive=false and deletedAt timestamp (Delete Confirmed)', async () => {
+    // I/O Matrix: Delete Confirmed — user confirms deletion of a valid employee
+    const existing = makeEntity({ isActive: true, deletedAt: null });
+    mockRepo.findOne.mockResolvedValue(existing);
+    mockRepo.save.mockResolvedValue({ ...existing, isActive: false, deletedAt: new Date() });
+
+    await expect(service.deleteEmployee('emp-1', 'org-1')).resolves.toBeUndefined();
+
+    expect(mockRepo.save).toHaveBeenCalledOnce();
+    const savedArg = mockRepo.save.mock.calls[0][0] as EmployeeEntity;
+    expect(savedArg.isActive).toBe(false);
+    expect(savedArg.deletedAt).toBeInstanceOf(Date);
+  });
+
+  it('throws NotFoundException when employee ID does not exist (Employee Not Found)', async () => {
+    // I/O Matrix: Employee Not Found — ID no longer exists when API is called → 404
+    mockRepo.findOne.mockResolvedValue(null);
+
+    await expect(
+      service.deleteEmployee('missing-id', 'org-1'),
+    ).rejects.toThrow(NotFoundException);
+  });
+});

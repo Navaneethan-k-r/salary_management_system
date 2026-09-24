@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Put, Body, Param, Query,
+  Controller, Get, Post, Put, Delete, Body, Param, Query,
   Req, UseGuards, DefaultValuePipe, ParseIntPipe, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
@@ -51,5 +51,16 @@ export class EmployeeController {
   ) {
     const session = req.user as any;
     return this.employeeService.updateEmployee(id, session.organizationId, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  async deleteEmployee(
+    @Req() req: Request,
+    @Param('id') id: string,
+  ) {
+    const session = req.user as any;
+    await this.employeeService.deleteEmployee(id, session.organizationId);
+    return { message: 'Employee deleted successfully' };
   }
 }

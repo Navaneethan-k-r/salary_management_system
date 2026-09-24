@@ -5,9 +5,13 @@ import {
   InputAdornment, Button, IconButton, Snackbar, Alert, Tooltip,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store';
-import { fetchEmployees, setPage, setLimit } from '../store/slices/employeeSlice';
+import {
+  fetchEmployees, setPage, setLimit,
+  deleteEmployee, clearDeletionError,
+} from '../store/slices/employeeSlice';
 import { EmployeeListDto } from '@salary-mgmt/shared-types';
 import AddEditEmployeeModal from '../components/AddEditEmployeeModal';
+import DeleteEmployeeDialog from '../components/DeleteEmployeeDialog';
 
 // Custom debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -21,7 +25,7 @@ function useDebounce<T>(value: T, delay: number): T {
 
 const EmployeeDirectoryPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { data, total, page, limit, loading } = useAppSelector((state) => state.employee);
+  const { data, total, page, limit, loading, deleting, deletionError } = useAppSelector((state) => state.employee);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -29,8 +33,14 @@ const EmployeeDirectoryPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeListDto | null>(null);
 
+  // Delete dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeListDto | null>(null);
+
   // Toast state
   const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastSeverity, setToastSeverity] = useState<'success' | 'error'>('success');
 
   useEffect(() => {
     // Reset page to 1 when search term changes
@@ -42,6 +52,16 @@ const EmployeeDirectoryPage: React.FC = () => {
     // Fetch when page or limit changes but not search
     dispatch(fetchEmployees({ search: debouncedSearchTerm, page, limit }));
   }, [page, limit, dispatch]);
+
+  // Show error toast when deletion fails
+  useEffect(() => {
+    if (deletionError) {
+      setToastMessage(deletionError);
+      setToastSeverity('error');
+      setToastOpen(true);
+      dispatch(clearDeletionError());
+    }
+  }, [deletionError, dispatch]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -74,9 +94,34 @@ const EmployeeDirectoryPage: React.FC = () => {
   const handleSaveSuccess = () => {
     setModalOpen(false);
     setSelectedEmployee(null);
+    setToastMessage('Employee saved successfully.');
+    setToastSeverity('success');
     setToastOpen(true);
     // Refresh the list to reflect the latest server state
     dispatch(fetchEmployees({ search: debouncedSearchTerm, page, limit }));
+  };
+
+  const handleDeleteClick = (employee: EmployeeListDto) => {
+    setEmployeeToDelete(employee);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setEmployeeToDelete(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!employeeToDelete) return;
+    const result = await dispatch(deleteEmployee(employeeToDelete.id));
+    if (deleteEmployee.fulfilled.match(result)) {
+      setDeleteDialogOpen(false);
+      setEmployeeToDelete(null);
+      setToastMessage('Employee deleted successfully.');
+      setToastSeverity('success');
+      setToastOpen(true);
+    }
+    // On rejection, deletionError effect handles the error toast; keep dialog open
   };
 
   const handleToastClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -161,7 +206,7 @@ const EmployeeDirectoryPage: React.FC = () => {
                   <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Mobile</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', width: 80 }}>Actions</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', width: 100 }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -221,6 +266,23 @@ const EmployeeDirectoryPage: React.FC = () => {
                             </svg>
                           </IconButton>
                         </Tooltip>
+                        <Tooltip title="Delete employee">
+                          <IconButton
+                            id={`delete-employee-${row.id}`}
+                            size="small"
+                            onClick={() => handleDeleteClick(row)}
+                            aria-label={`Delete ${row.fullName}`}
+                            sx={{ color: 'error.main' }}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                              <path d="M10 11v6" />
+                              <path d="M14 11v6" />
+                              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                            </svg>
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))
@@ -248,16 +310,25 @@ const EmployeeDirectoryPage: React.FC = () => {
         onSuccess={handleSaveSuccess}
       />
 
-      {/* Success toast */}
+      {/* Delete confirmation dialog */}
+      <DeleteEmployeeDialog
+        open={deleteDialogOpen}
+        employee={employeeToDelete}
+        deleting={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
+
+      {/* Toast notifications */}
       <Snackbar
         open={toastOpen}
         autoHideDuration={4000}
         onClose={handleToastClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        id="employee-saved-snackbar"
+        id="employee-action-snackbar"
       >
-        <Alert onClose={handleToastClose} severity="success" variant="filled" sx={{ width: '100%' }}>
-          Employee saved successfully.
+        <Alert onClose={handleToastClose} severity={toastSeverity} variant="filled" sx={{ width: '100%' }}>
+          {toastMessage}
         </Alert>
       </Snackbar>
     </Box>

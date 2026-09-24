@@ -48,4 +48,11 @@ export const employeeService = {
     });
     return response.data;
   },
+
+  async deleteEmployee(id: string): Promise<{ message: string }> {
+    const response = await axios.delete<{ message: string }>(`${API_URL}/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  },
 };
