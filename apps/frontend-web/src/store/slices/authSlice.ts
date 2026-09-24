@@ -13,7 +13,12 @@ const getInitialSession = (): UserSession | null => {
   try {
     const stored = sessionStorage.getItem('auth_session');
     if (stored) {
-      return JSON.parse(stored) as UserSession;
+      const parsed = JSON.parse(stored) as UserSession;
+      if (parsed.expiresAt && Date.now() > new Date(parsed.expiresAt).getTime()) {
+        sessionStorage.removeItem('auth_session');
+        return null;
+      }
+      return parsed;
     }
   } catch (e) {
     console.error('Failed to parse stored session', e);

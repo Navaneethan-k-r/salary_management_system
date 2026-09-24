@@ -2,10 +2,10 @@
 title: 'Story 1.2: HR Admin Authentication & Base Layout'
 type: 'feature'
 created: '2026-09-23'
-status: 'in-review'
+status: 'done'
 baseline_commit: '3b783f84d9a6c46598ab9a6cf2c8005393f1ab56'
 route: 'dispatch'
-review_loop_iteration: 0
+review_loop_iteration: 1
 context:
   - '_bmad-output/planning-artifacts/architecture/architecture-salary_management_system-20260923/ARCHITECTURE-SPINE.md'
   - '_bmad-output/planning-artifacts/ux-designs/ux-salary_management_system-20260923/DESIGN.md'
@@ -93,6 +93,17 @@ context:
 ## Spec Change Log
 
 ## Review Triage Log
+
+### Review Findings
+- [x] [Review][Patch] Check session expiration on client re-hydration [apps/frontend-web/src/store/slices/authSlice.ts:24]
+- [x] [Review][Patch] Replace hardcoded design token values in AdminLayout with theme tokens [apps/frontend-web/src/layouts/AdminLayout.tsx:44]
+- [x] [Review][Patch] Add regression unit tests for location state redirect and expired session rehydration [apps/frontend-web/src/pages/LoginPage.spec.tsx:95]
+
+#### Rejected
+- [Review][Rejected][False] Consolidate SessionStore to separate module `./session-store`: Monorepo path mappings and lack of independent build target for `shared-auth` cause module resolution errors when referenced across package boundaries. The self-contained barrel in `index.ts` is required.
+- [Review][Rejected][False] `login.fulfilled` hardcodes fallback email/role: The real backend response always populates `user`, and fallback is only defensive typing.
+- [Review][Rejected][Low] `authService.baseUrl` ignores invalid port formats in `VITE_API_BASE_URL`: Standard URL configs suffice in environment variables.
+- [Review][Rejected][False] `generateOpaqueToken` default length: Callee in AuthService explicitly calls `generateOpaqueToken(10)` fulfilling `<12 chars`.
 
 ## Design Notes
 

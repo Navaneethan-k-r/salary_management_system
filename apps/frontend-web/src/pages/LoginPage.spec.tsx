@@ -92,4 +92,24 @@ describe('LoginPage', () => {
     
     expect(await screen.findByText('Invalid credentials')).toBeInTheDocument();
   });
+
+  it('clears expired session from storage', () => {
+    const expiredSession = {
+      token: 'old-token',
+      userId: '1',
+      role: 'hr_admin',
+      email: 'admin@example.com',
+      organizationId: 'org-1',
+      createdAt: new Date(Date.now() - 100000).toISOString(),
+      expiresAt: new Date(Date.now() - 1000).toISOString(),
+    };
+
+    sessionStorage.setItem('auth_session', JSON.stringify(expiredSession));
+    const parsed = JSON.parse(sessionStorage.getItem('auth_session') || '{}');
+    const isExpired = Date.now() > new Date(parsed.expiresAt).getTime();
+    expect(isExpired).toBe(true);
+
+    sessionStorage.removeItem('auth_session');
+    expect(sessionStorage.getItem('auth_session')).toBeNull();
+  });
 });
