@@ -1,16 +1,22 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { EmployeeEntity } from '../database/employee.entity';
+import { ActivationTokenEntity } from '../database/activation-token.entity';
 import { EmployeeListDto, PaginatedResponseDto } from '@salary-mgmt/shared-types';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { RabbitMQPublisherService } from '../events/rabbitmq-publisher.service';
 
 @Injectable()
 export class EmployeeService {
   constructor(
     @InjectRepository(EmployeeEntity)
     private employeeRepository: Repository<EmployeeEntity>,
+    @InjectRepository(ActivationTokenEntity)
+    private activationTokenRepository: Repository<ActivationTokenEntity>,
+    private readonly rabbitMQPublisher: RabbitMQPublisherService,
   ) {}
 
   private toDto(e: EmployeeEntity): EmployeeListDto {
@@ -81,6 +87,30 @@ export class EmployeeService {
     });
 
     const saved = await this.employeeRepository.save(employee);
+
+    // Generate a database-backed activation token (valid for 7 days)
+    const token = uuidv4();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+
+    await this.activationTokenRepository.save(
+      this.activationTokenRepository.create({
+        employeeId: saved.id,
+        token,
+        expiresAt,
+      }),
+    );
+
+    // Publish event asynchronously — does NOT block the HTTP response.
+    // Any publish failure is logged by the publisher service.
+    void this.rabbitMQPublisher.publishEmployeeCreated({
+      employeeId: saved.id,
+      email: saved.email,
+      fullName: saved.fullName,
+      organizationId: saved.organizationId,
+      activationToken: token,
+    });
+
     return this.toDto(saved);
   }
 

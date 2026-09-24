@@ -20,6 +20,14 @@ export default defineConfig({
           globals: true,
         },
       },
+      {
+        test: {
+          name: 'service-worker',
+          root: './apps/service-worker',
+          environment: 'node',
+          globals: true,
+        },
+      },
     ],
   },
 });

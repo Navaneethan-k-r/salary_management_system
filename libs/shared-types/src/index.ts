@@ -97,3 +97,18 @@ export interface UpdateEmployeeDto {
   mobile?: string;
   salaryPackageId?: string; // Placeholder until Epic 3 Salary Configuration is available
 }
+
+/**
+ * Domain event published to RabbitMQ when a new employee is created.
+ * Consumed by service-worker to send the onboarding email.
+ */
+export interface EmployeeCreatedEvent {
+  employeeId: string;
+  email: string;
+  fullName: string;
+  organizationId: string;
+  /** Stateful activation token stored in the DB; used to build the setup link. */
+  activationToken: string;
+}
+
+export const EMPLOYEE_CREATED_QUEUE = 'employee.created';

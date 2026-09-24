@@ -2,7 +2,8 @@
 title: 'Story 2.4: First-Time Employee Onboarding Notification'
 type: 'feature'
 created: '2026-09-23'
-status: 'ready-for-dev'
+status: 'in-progress'
+baseline_commit: 'b35c0bb633033a05c79b6455f74960a1e37609b7'
 route: 'dispatch'
 review_loop_iteration: 0
 context:
@@ -53,9 +54,9 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `apps/service-employee/src/employee/employee.service.ts` -- Publish event on creation -- Decouples email sending from HTTP request.
-- [ ] `apps/service-worker/src/notification/notification.consumer.ts` -- Consume event and trigger email -- Handles the asynchronous background work.
-- [ ] `apps/service-worker/src/notification/email.service.ts` -- Construct and send the email with the activation link -- Delivers the message to the user.
+- [x] `apps/service-employee/src/employee/employee.service.ts` -- Publish event on creation -- Decouples email sending from HTTP request.
+- [x] `apps/service-worker/src/notification/notification.consumer.ts` -- Consume event and trigger email -- Handles the asynchronous background work.
+- [x] `apps/service-worker/src/notification/email.service.ts` -- Construct and send the email with the activation link -- Delivers the message to the user.
 
 **Acceptance Criteria:**
 - Given HR successfully adds a new employee, when the employee is saved, then an `EmployeeCreatedEvent` is published to the message broker.

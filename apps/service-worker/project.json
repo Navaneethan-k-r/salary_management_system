@@ -1,0 +1,27 @@
+{
+  "name": "service-worker",
+  "projectType": "application",
+  "sourceRoot": "apps/service-worker/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/service-worker"],
+      "options": {
+        "command": "tsc -p apps/service-worker/tsconfig.app.json"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "node dist/apps/service-worker/main.js"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run apps/service-worker"
+      }
+    }
+  }
+}

@@ -4,12 +4,23 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { EmployeeEntity } from '../database/employee.entity';
+import { ActivationTokenEntity } from '../database/activation-token.entity';
+import { RabbitMQPublisherService } from '../events/rabbitmq-publisher.service';
 
 const mockRepo = {
   createQueryBuilder: vi.fn(),
   findOne: vi.fn(),
   create: vi.fn(),
   save: vi.fn(),
+};
+
+const mockActivationTokenRepo = {
+  create: vi.fn(),
+  save: vi.fn(),
+};
+
+const mockRabbitMQPublisher = {
+  publishEmployeeCreated: vi.fn(),
 };
 
 const makeEntity = (overrides = {}): EmployeeEntity => ({
@@ -29,13 +40,11 @@ describe('EmployeeService — createEmployee', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        EmployeeService,
-        { provide: getRepositoryToken(EmployeeEntity), useValue: mockRepo },
-      ],
-    }).compile();
-    service = module.get<EmployeeService>(EmployeeService);
+    service = new EmployeeService(
+      mockRepo as any,
+      mockActivationTokenRepo as any,
+      mockRabbitMQPublisher as any,
+    );
   });
 
   it('creates and returns a new employee when email is unique', async () => {
@@ -55,6 +64,13 @@ describe('EmployeeService — createEmployee', () => {
     expect(result.id).toBe('emp-1');
     expect(result.email).toBe('alice@example.com');
     expect(result.status).toBe('pending_onboarding');
+    expect(mockActivationTokenRepo.save).toHaveBeenCalledOnce();
+    expect(mockRabbitMQPublisher.publishEmployeeCreated).toHaveBeenCalledWith(
+      expect.objectContaining({
+        employeeId: 'emp-1',
+        email: 'alice@example.com',
+      })
+    );
   });
 
   it('throws ConflictException when email is already registered', async () => {
@@ -86,13 +102,11 @@ describe('EmployeeService — updateEmployee', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        EmployeeService,
-        { provide: getRepositoryToken(EmployeeEntity), useValue: mockRepo },
-      ],
-    }).compile();
-    service = module.get<EmployeeService>(EmployeeService);
+    service = new EmployeeService(
+      mockRepo as any,
+      mockActivationTokenRepo as any,
+      mockRabbitMQPublisher as any,
+    );
   });
 
   it('updates mobile and returns the updated employee', async () => {
@@ -124,13 +138,11 @@ describe('EmployeeService — deleteEmployee', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        EmployeeService,
-        { provide: getRepositoryToken(EmployeeEntity), useValue: mockRepo },
-      ],
-    }).compile();
-    service = module.get<EmployeeService>(EmployeeService);
+    service = new EmployeeService(
+      mockRepo as any,
+      mockActivationTokenRepo as any,
+      mockRabbitMQPublisher as any,
+    );
   });
 
   it('soft-deletes the employee by setting isActive=false and deletedAt timestamp (Delete Confirmed)', async () => {
