@@ -22,6 +22,12 @@
       "options": {
         "command": "typeorm migration:run -d dist/apps/service-employee/src/database/data-source.js"
       }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run apps/service-employee"
+      }
     }
   }
 }

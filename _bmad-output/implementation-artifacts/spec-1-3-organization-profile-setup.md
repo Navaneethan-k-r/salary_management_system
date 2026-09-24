@@ -83,6 +83,29 @@ context:
 - Given an HR Administrator submitting the form with invalid inputs (empty name, non-alphanumeric code, or malformed email), when submission is attempted, then validation errors are shown on the corresponding fields and no network call is dispatched.
 - Given the organization profile is saved, when refreshing the page or re-navigating to `/admin/organization`, then the persisted organization details are displayed accurately.
 
+### Review Findings
+
+- [ ] [Review][Patch] Corrupted Currency Symbol Display (mojibake) [OrganizationProfilePage.tsx]
+- [ ] [Review][Patch] Missing Organization entity registration in typeorm.config.ts [typeorm.config.ts]
+- [ ] [Review][Patch] Missing test target in apps/service-employee/project.json [project.json]
+- [ ] [Review][Patch] Fetch error masking as "Initial setup required" [OrganizationProfilePage.tsx]
+- [ ] [Review][Patch] Direct Redis instantiation / Decoupled Session Store in AuthGuard [auth.guard.ts]
+- [ ] [Review][Patch] Missing role authorization check in AuthGuard [auth.guard.ts]
+- [ ] [Review][Patch] Controller restricts PUT payload to CreateOrganizationDto [organization.controller.ts]
+- [ ] [Review][Patch] Missing focus on first invalid field on validation error [OrganizationProfilePage.tsx]
+- [ ] [Review][Patch] Missing display of "last updated timestamp" [OrganizationProfilePage.tsx]
+- [ ] [Review][Patch] Concurrency race condition on initial organization creation [organization.service.ts]
+- [ ] [Review][Patch] Missing unit test suite for AuthGuard [auth.guard.ts]
+- [ ] [Review][Patch] Inconsistent container and card styling against design guidelines [OrganizationProfilePage.tsx]
+- [ ] [Review][Patch] Unverified save error handling in UI [OrganizationProfilePage.tsx]
+- [ ] [Review][Patch] Unverified conflict exception on organization update [organization.service.ts]
+- [ ] [Review][Patch] Unverified bad request exception on incomplete creation [organization.service.ts]
+- [ ] [Review][Patch] Unverified frontend authorization header attachment [organizationService.ts]
+- [ ] [Review][Patch] User clicks outside the snackbar dismisses it prematurely [OrganizationProfilePage.tsx]
+- [ ] [Review][Patch] Input fields exceed database varchar limits (missing DTO validation) [organization.dto.ts]
+- [ ] [Review][Patch] Browser blocks sessionStorage access causing crash [organizationService.ts]
+- [ ] [Review][Patch] Duplicated Error Message Rendering on Network/Server Failure [OrganizationProfilePage.tsx]
+
 ## Implementation Notes
 
 ## Spec Change Log

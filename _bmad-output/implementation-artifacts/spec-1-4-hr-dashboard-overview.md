@@ -2,9 +2,10 @@
 title: 'Story 1.4: HR Dashboard Overview'
 type: 'feature'
 created: '2026-09-23'
-status: 'ready-for-dev'
+status: 'in-review'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: 'fbb44128fce1c0bc7ae140d52ec1aabccd85e745'
 context:
   - '_bmad-output/implementation-artifacts/epic-1-context.md'
 ---
@@ -52,10 +53,10 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `apps/service-employee/src/controllers/dashboard.controller.ts` -- Implement backend endpoints to return total employee count and recent payroll summary.
-- [ ] `apps/frontend-web/src/pages/admin/Dashboard.tsx` -- Create the main dashboard component with Skeleton loaders and error handling.
-- [ ] `apps/frontend-web/src/pages/admin/Dashboard.spec.tsx` -- Add unit tests for loading, empty, and populated states.
-- [ ] `apps/frontend-web/src/routes/index.tsx` -- Register `/admin/dashboard` as a protected route using the layout from Story 1.2.
+- [x] `apps/service-employee/src/controllers/dashboard.controller.ts` -- Implement backend endpoints to return total employee count and recent payroll summary.
+- [x] `apps/frontend-web/src/pages/admin/Dashboard.tsx` -- Create the main dashboard component with Skeleton loaders and error handling.
+- [x] `apps/frontend-web/src/pages/admin/Dashboard.spec.tsx` -- Add unit tests for loading, empty, and populated states.
+- [x] `apps/frontend-web/src/routes/index.tsx` -- Register `/admin/dashboard` as a protected route using the layout from Story 1.2.
 
 **Acceptance Criteria:**
 - Given I am a logged-in HR Administrator, when I navigate to `/admin/dashboard`, then I see the total count of employees and a summary of recent payroll runs.
