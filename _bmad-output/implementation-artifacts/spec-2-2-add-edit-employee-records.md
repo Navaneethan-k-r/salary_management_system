@@ -2,9 +2,10 @@
 title: 'Story 2.2: Add & Edit Employee Records'
 type: 'feature'
 created: '2026-09-23'
-status: 'ready-for-dev'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
+baseline_commit: '0fb5dfadbf0de755b56463eba67b6be548a891a7'
 context:
   - '_bmad-output/implementation-artifacts/epic-2-context.md'
 ---
@@ -55,12 +56,12 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `libs/shared-types/src/index.ts` -- Add `CreateEmployeeDto` and `UpdateEmployeeDto` -- Formalizes the API contracts for mutations.
-- [ ] `apps/service-employee/src/employee/employee.service.ts` & `apps/service-employee/src/employee/employee.controller.ts` -- Implement `POST` and `PUT` endpoints -- Handles database inserts and updates with validation.
-- [ ] `apps/frontend-web/src/services/employeeService.ts` -- Add client service methods for mutations -- Connects frontend forms to backend APIs.
-- [ ] `apps/frontend-web/src/store/slices/employeeSlice.ts` -- Add thunks for create and update -- Manages async state and updates the local list.
-- [ ] `apps/frontend-web/src/components/AddEditEmployeeModal.tsx` -- Build the modal/drawer form -- Provides the UI for data entry, using a mock dropdown for the salary package if Epic 3 APIs are unavailable.
-- [ ] `apps/frontend-web/src/pages/EmployeeDirectoryPage.tsx` -- Wire up "Add" and "Edit" buttons to the modal -- Integrates the form into the directory view and handles success toasts.
+- [x] `libs/shared-types/src/index.ts` -- Add `CreateEmployeeDto` and `UpdateEmployeeDto` -- Formalizes the API contracts for mutations.
+- [x] `apps/service-employee/src/employee/employee.service.ts` & `apps/service-employee/src/employee/employee.controller.ts` -- Implement `POST` and `PUT` endpoints -- Handles database inserts and updates with validation.
+- [x] `apps/frontend-web/src/services/employeeService.ts` -- Add client service methods for mutations -- Connects frontend forms to backend APIs.
+- [x] `apps/frontend-web/src/store/slices/employeeSlice.ts` -- Add thunks for create and update -- Manages async state and updates the local list.
+- [x] `apps/frontend-web/src/components/AddEditEmployeeModal.tsx` -- Build the modal/drawer form -- Provides the UI for data entry, using a mock dropdown for the salary package if Epic 3 APIs are unavailable.
+- [x] `apps/frontend-web/src/pages/EmployeeDirectoryPage.tsx` -- Wire up "Add" and "Edit" buttons to the modal -- Integrates the form into the directory view and handles success toasts.
 
 **Acceptance Criteria:**
 - Given I am on the Employee Directory, when I click "Add Employee", then a modal/drawer opens to collect employee details without a password field.
@@ -69,9 +70,34 @@ context:
 
 ## Implementation Notes
 
+- **Backend DTOs**: Created `apps/service-employee/src/employee/dto/create-employee.dto.ts` and `update-employee.dto.ts` with `class-validator` decorators (email format, mobile regex, non-empty checks). The global `ValidationPipe` in `main.ts` handles automatic request validation and 400 responses.
+- **Duplicate email**: `createEmployee` calls `findOne` scoped to `organizationId` before insert; throws `ConflictException` (HTTP 409) with the message "Email already registered." for the frontend to surface.
+- **salaryPackageId**: Accepted in DTOs and dispatched through Redux but not yet persisted on `EmployeeEntity` — that field belongs in Epic 3. A mocked dropdown (4 representative packages) is shown in the form.
+- **Email immutability**: `UpdateEmployeeDto` deliberately omits `email`; the controller only accepts mobile/fullName/salaryPackageId for PUT.
+- **Redux state**: Added `mutating` / `mutationError` fields separate from the list's `loading` / `error` so the modal spinner and the list skeleton never conflict.
+- **Tests**: `employee.service.spec.ts` covers all 3 I/O matrix rows (add, duplicate, edit). `AddEditEmployeeModal.spec.tsx` adds 8 component tests covering validation, API errors, pre-fill, and success callbacks.
+
 ## Spec Change Log
 
 ## Review Triage Log
+
+| # | Source | Finding | Verdict | Route | Evidence |
+|---|--------|---------|---------|-------|----------|
+| 1 | blind-hunter | Email duplicate ConflictException not thrown | `false` | — | `employee.service.ts:62–68` calls `findOne` first and throws `ConflictException('Email already registered.')` before any DB insert. |
+| 2 | blind-hunter | UpdateEmployeeDto doesn't protect system fields | `false` | — | DTO only exposes `fullName`, `mobile`, `salaryPackageId`. NestJS `ValidationPipe(whitelist:true)` strips unknown fields; `id`/timestamps are never in the DTO. |
+| 3 | blind-hunter | Numeric salary validation missing | `false` | — | No numeric salary field exists; spec Decision Record mandates a string `salaryPackageId` placeholder for Epic 3. Out of scope. |
+| 4 | blind-hunter | Whitespace not trimmed on fullName/mobile | `low` | `patch` | Auto-fixed: `createEmployee` and `updateEmployee` now call `.trim()` on fullName and mobile; email is normalized with `.trim().toLowerCase()` before duplicate check and store. |
+| 5 | blind-hunter | Redux update resets filters/pagination | `false` | — | `updateEmployee.fulfilled` patches `state.data[index]` in-place; no pagination/filter keys are touched. |
+| 6 | blind-hunter | Modal errors not reset on re-open | `false` | — | `AddEditEmployeeModal` `useEffect` on `open` calls `setErrors({})` and `dispatch(clearMutationError())`. |
+| 7 | blind-hunter | Date timezone shift in date pickers | `false` | — | No date fields exist in this form; inapplicable to this story. |
+| 8 | blind-hunter | Double submission not prevented | `false` | — | Save button has `disabled={mutating}` and shows `CircularProgress` when `mutating` is true. |
+| 9 | blind-hunter | Snackbar missing aria-live | `low` | Rejected | MUI `Alert` already carries `role="alert"`. Adding explicit `aria-live` is cosmetic; unlikely to affect everyday users; fix adds complexity. |
+| 10 | blind-hunter | Edit mode pre-fill test missing | `false` | — | `AddEditEmployeeModal.spec.tsx` contains `it('pre-fills form...')` and `it('calls updateEmployee and onSuccess...')` in the Edit mode describe block. |
+| 11 | edge-case | `createEmployee` — DB infrastructure error bubbles as 500 | `false` | — | Correct behavior for infrastructure failures; NestJS global exception filter handles this. |
+| 12 | edge-case | `updateEmployee` — invalid UUID format | `false` | — | `findOne` with invalid UUID returns null → `NotFoundException` thrown and mapped to HTTP 404. |
+| 13 | edge-case | `handleSaveSuccess` re-fetch error silently ignored | `low` | Rejected | Real but low: fetch failure after a successful save shows stale data; fixing requires a separate error toast path adding complexity beyond this story's scope. Defer. |
+| 14 | edge-case | `createEmployee.fulfilled` — totalPages not recalculated | `low` | Rejected | Low cosmetic edge case on the exact boundary page; the next real fetch corrects it. Fix adds complexity. |
+| 15 | verification-gap | Redux slice `createEmployee` thunk — no dedicated unit test for state mutation | `low` | `defer` | Real gap: `AddEditEmployeeModal.spec.tsx` mocks the service so the thunk's in-slice behavior (prepending to `state.data`) is not explicitly asserted. Low risk — RTK is well-tested OSS; add a slice spec in a future story. |
 
 ## Design Notes
 

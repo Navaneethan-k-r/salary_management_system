@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, Typography, TextField, Paper, Table, TableBody, TableCell, 
+import {
+  Box, Typography, TextField, Paper, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, TablePagination, Skeleton,
-  InputAdornment
+  InputAdornment, Button, IconButton, Snackbar, Alert, Tooltip,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../store';
 import { fetchEmployees, setPage, setLimit } from '../store/slices/employeeSlice';
+import { EmployeeListDto } from '@salary-mgmt/shared-types';
+import AddEditEmployeeModal from '../components/AddEditEmployeeModal';
 
 // Custom debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -22,6 +24,13 @@ const EmployeeDirectoryPage: React.FC = () => {
   const { data, total, page, limit, loading } = useAppSelector((state) => state.employee);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<EmployeeListDto | null>(null);
+
+  // Toast state
+  const [toastOpen, setToastOpen] = useState(false);
 
   useEffect(() => {
     // Reset page to 1 when search term changes
@@ -47,17 +56,72 @@ const EmployeeDirectoryPage: React.FC = () => {
     dispatch(setPage(1));
   };
 
+  const handleAddClick = () => {
+    setSelectedEmployee(null);
+    setModalOpen(true);
+  };
+
+  const handleEditClick = (employee: EmployeeListDto) => {
+    setSelectedEmployee(employee);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedEmployee(null);
+  };
+
+  const handleSaveSuccess = () => {
+    setModalOpen(false);
+    setSelectedEmployee(null);
+    setToastOpen(true);
+    // Refresh the list to reflect the latest server state
+    dispatch(fetchEmployees({ search: debouncedSearchTerm, page, limit }));
+  };
+
+  const handleToastClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setToastOpen(false);
+  };
+
   const isEmpty = data.length === 0 && !loading && !searchTerm;
 
   return (
     <Box sx={{ p: '24px' }}>
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-        Employee Directory
-      </Typography>
+      {/* Header row */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+          Employee Directory
+        </Typography>
+        <Button
+          id="add-employee-button"
+          variant="contained"
+          color="primary"
+          onClick={handleAddClick}
+          startIcon={
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          }
+          sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+        >
+          Add Employee
+        </Button>
+      </Box>
 
       {isEmpty ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 10 }}>
-          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#9ca3af', marginBottom: '16px' }}>
+        <Box
+          sx={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', py: 10,
+          }}
+        >
+          <svg
+            width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
+            style={{ color: '#9ca3af', marginBottom: '16px' }}
+          >
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <line x1="19" y1="8" x2="19" y2="14" />
@@ -96,6 +160,8 @@ const EmployeeDirectoryPage: React.FC = () => {
                   <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Mobile</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', width: 80 }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -105,23 +171,57 @@ const EmployeeDirectoryPage: React.FC = () => {
                       <TableCell><Skeleton animation="wave" height={24} /></TableCell>
                       <TableCell><Skeleton animation="wave" height={24} /></TableCell>
                       <TableCell><Skeleton animation="wave" height={24} /></TableCell>
+                      <TableCell><Skeleton animation="wave" height={24} /></TableCell>
+                      <TableCell><Skeleton animation="wave" height={24} /></TableCell>
                     </TableRow>
                   ))
                 ) : data.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
+                    <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                       No results found
                     </TableCell>
                   </TableRow>
                 ) : (
                   data.map((row) => (
-                    <TableRow 
+                    <TableRow
                       key={row.id}
                       sx={{ '&:hover': { backgroundColor: '#f3f4f6' } }}
                     >
                       <TableCell>{row.fullName}</TableCell>
                       <TableCell>{row.email}</TableCell>
                       <TableCell>{row.mobile}</TableCell>
+                      <TableCell>
+                        <Box
+                          component="span"
+                          sx={{
+                            display: 'inline-block',
+                            px: 1, py: 0.25,
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            backgroundColor: row.status === 'active' ? '#d1fae5' : row.status === 'pending_onboarding' ? '#fef3c7' : '#fee2e2',
+                            color: row.status === 'active' ? '#065f46' : row.status === 'pending_onboarding' ? '#92400e' : '#991b1b',
+                            textTransform: 'capitalize',
+                          }}
+                        >
+                          {row.status.replace(/_/g, ' ')}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip title="Edit employee">
+                          <IconButton
+                            id={`edit-employee-${row.id}`}
+                            size="small"
+                            onClick={() => handleEditClick(row)}
+                            aria-label={`Edit ${row.fullName}`}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -139,6 +239,27 @@ const EmployeeDirectoryPage: React.FC = () => {
           />
         </Paper>
       )}
+
+      {/* Add / Edit modal */}
+      <AddEditEmployeeModal
+        open={modalOpen}
+        employee={selectedEmployee}
+        onClose={handleModalClose}
+        onSuccess={handleSaveSuccess}
+      />
+
+      {/* Success toast */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        id="employee-saved-snackbar"
+      >
+        <Alert onClose={handleToastClose} severity="success" variant="filled" sx={{ width: '100%' }}>
+          Employee saved successfully.
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

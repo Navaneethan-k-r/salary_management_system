@@ -84,3 +84,16 @@ export interface PaginatedResponseDto<T> {
 }
 
 export interface EmployeeListDto extends Omit<Employee, 'organizationId'> {}
+
+export interface CreateEmployeeDto {
+  email: string;
+  fullName: string;
+  mobile: string;
+  salaryPackageId: string; // Placeholder until Epic 3 Salary Configuration is available
+}
+
+export interface UpdateEmployeeDto {
+  fullName?: string;
+  mobile?: string;
+  salaryPackageId?: string; // Placeholder until Epic 3 Salary Configuration is available
+}

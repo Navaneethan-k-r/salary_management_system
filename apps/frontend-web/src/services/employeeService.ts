@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PaginatedResponseDto, EmployeeListDto } from '@salary-mgmt/shared-types';
+import { PaginatedResponseDto, EmployeeListDto, CreateEmployeeDto, UpdateEmployeeDto } from '@salary-mgmt/shared-types';
 
 const API_URL = '/api/employees';
 
@@ -33,5 +33,19 @@ export const employeeService = {
       params,
     });
     return response.data;
-  }
+  },
+
+  async createEmployee(dto: CreateEmployeeDto): Promise<EmployeeListDto> {
+    const response = await axios.post<EmployeeListDto>(API_URL, dto, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  },
+
+  async updateEmployee(id: string, dto: UpdateEmployeeDto): Promise<EmployeeListDto> {
+    const response = await axios.put<EmployeeListDto>(`${API_URL}/${id}`, dto, {
+      headers: getAuthHeaders(),
+    });
+    return response.data;
+  },
 };

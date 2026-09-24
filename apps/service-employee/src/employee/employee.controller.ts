@@ -1,6 +1,11 @@
-import { Controller, Get, Query, Req, UseGuards, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller, Get, Post, Put, Body, Param, Query,
+  Req, UseGuards, DefaultValuePipe, ParseIntPipe, HttpCode, HttpStatus,
+} from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Request } from 'express';
 
 @Controller('employees')
@@ -24,7 +29,27 @@ export class EmployeeController {
       limit,
       search,
       sortBy,
-      sortOrder
+      sortOrder,
     );
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async createEmployee(
+    @Req() req: Request,
+    @Body() dto: CreateEmployeeDto,
+  ) {
+    const session = req.user as any;
+    return this.employeeService.createEmployee(session.organizationId, dto);
+  }
+
+  @Put(':id')
+  async updateEmployee(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() dto: UpdateEmployeeDto,
+  ) {
+    const session = req.user as any;
+    return this.employeeService.updateEmployee(id, session.organizationId, dto);
   }
 }
