@@ -74,3 +74,13 @@ export interface UpdateOrganizationProfileDto {
   code?: string;
   contactEmail?: string;
 }
+
+export interface PaginatedResponseDto<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface EmployeeListDto extends Omit<Employee, 'organizationId'> {}

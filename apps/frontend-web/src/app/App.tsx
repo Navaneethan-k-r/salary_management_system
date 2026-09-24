@@ -8,6 +8,7 @@ import { AdminLayout } from '../layouts/AdminLayout';
 import { Dashboard } from '../pages/admin/Dashboard';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { OrganizationProfilePage } from '../pages/OrganizationProfilePage';
+import EmployeeDirectoryPage from '../pages/EmployeeDirectoryPage';
 
 export const App: React.FC = () => {
   return (
@@ -30,7 +31,7 @@ export const App: React.FC = () => {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="organization" element={<OrganizationProfilePage />} />
-              <Route path="employees" element={<div>Employees Page (Not Implemented)</div>} />
+              <Route path="employees" element={<EmployeeDirectoryPage />} />
               <Route path="salary-config" element={<div>Salary Config (Not Implemented)</div>} />
               <Route path="payslips" element={<div>Payslips (Not Implemented)</div>} />
             </Route>

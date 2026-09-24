@@ -2,7 +2,8 @@
 title: 'Story 2.1: Employee Directory List & Empty State'
 type: 'feature'
 created: '2026-09-23'
-status: 'ready-for-dev'
+status: 'in-review'
+baseline_commit: '1699f2ca0a58539caeb0d2b8b9874bcdd40ffb18'
 route: 'dispatch'
 review_loop_iteration: 0
 context:
@@ -64,13 +65,13 @@ context:
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `libs/shared-types/src/index.ts` -- Add `EmployeeListDto` and `PaginatedResponseDto` interfaces -- Formalizes API contract.
-- [ ] `apps/service-employee/src/database/schema.sql` -- Create `employees` table definition -- Persists employee data.
-- [ ] `apps/service-employee/src/employee/employee.service.ts` & `apps/service-employee/src/employee/employee.controller.ts` -- Implement endpoint `GET /api/employees` -- Serves paginated, searchable employee list.
-- [ ] `apps/frontend-web/src/services/employeeService.ts` -- Implement client service for `GET /api/employees` -- Connects frontend to backend.
-- [ ] `apps/frontend-web/src/store/slices/employeeSlice.ts` -- Implement Redux slice for employee list -- Manages local state for the directory.
-- [ ] `apps/frontend-web/src/pages/EmployeeDirectoryPage.tsx` -- Build directory page with empty state, data table, search, and pagination -- Delivers the UI required for HR to view employees.
-- [ ] `apps/frontend-web/src/layouts/AdminLayout.tsx` & `apps/frontend-web/src/app/App.tsx` -- Add navigation link and route -- Integrates view into admin shell.
+- [x] `libs/shared-types/src/index.ts` -- Add `EmployeeListDto` and `PaginatedResponseDto` interfaces -- Formalizes API contract.
+- [x] `apps/service-employee/migrations/*-CreateEmployeeTable.ts` -- Create `employees` table definition via migration -- Persists employee data.
+- [x] `apps/service-employee/src/employee/employee.service.ts` & `apps/service-employee/src/employee/employee.controller.ts` -- Implement endpoint `GET /api/employees` -- Serves paginated, searchable employee list.
+- [x] `apps/frontend-web/src/services/employeeService.ts` -- Implement client service for `GET /api/employees` -- Connects frontend to backend.
+- [x] `apps/frontend-web/src/store/slices/employeeSlice.ts` -- Implement Redux slice for employee list -- Manages local state for the directory.
+- [x] `apps/frontend-web/src/pages/EmployeeDirectoryPage.tsx` -- Build directory page with empty state, data table, search, and pagination -- Delivers the UI required for HR to view employees.
+- [x] `apps/frontend-web/src/layouts/AdminLayout.tsx` & `apps/frontend-web/src/app/App.tsx` -- Add navigation link and route -- Integrates view into admin shell.
 
 **Acceptance Criteria:**
 - Given I navigate to the Employee Directory, when no employees exist in the database, then I see an empty state reading "No employees added yet. Add an employee to get started." with an illustration.

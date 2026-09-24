@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HrAdmin } from './hr-admin.entity';
 import { Organization } from './organization.entity';
+import { EmployeeEntity } from './employee.entity';
 
 @Module({
   imports: [
@@ -12,14 +13,14 @@ import { Organization } from './organization.entity';
       username: process.env.DB_USERNAME || 'root',
       password: process.env.DB_PASSWORD || 'rootpassword',
       database: process.env.DB_DATABASE || 'salary_management',
-      entities: [HrAdmin, Organization],
+      entities: [HrAdmin, Organization, EmployeeEntity],
       synchronize: false, // Always false in production; migrations manage schema changes
       logging: ['error', 'warn'],
       extra: {
         connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT || '10', 10),
       },
     }),
-    TypeOrmModule.forFeature([HrAdmin, Organization]),
+    TypeOrmModule.forFeature([HrAdmin, Organization, EmployeeEntity]),
   ],
   exports: [TypeOrmModule],
 })
